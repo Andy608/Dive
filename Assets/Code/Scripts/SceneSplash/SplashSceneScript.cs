@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class SplashSceneScript : MonoBehaviour 
 {	
-	public float pauseTime = 3.0f;
+	public float pauseTime = 1.0f;
 	public float startingScale;
 	public float endingScale;
 	public float timeToTransition;
@@ -56,9 +56,10 @@ public class SplashSceneScript : MonoBehaviour
 		blackFadeScript.endingAlpha = 0.0f;
 		blackFadeScript.timeToTransition = 1.5f;
 		blackFadeScript.imageColor = new Vector4(0.0f, 0.0f, 0.0f, blackFadeScript.startingAlpha);
-		blackFadeScript.startTransition();
 
 		startFinished = true;
+		blackFadeScript.startTransition();
+
 	}
 	
 	void Update () 
