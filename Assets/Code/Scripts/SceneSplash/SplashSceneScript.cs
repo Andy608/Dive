@@ -15,8 +15,10 @@ public class SplashSceneScript : MonoBehaviour
 	public GameObject blackFadePrefab;
 	public Image bountiveLogoPrefab;
 
-	private GameObject blackFadeTransitionObj;
-	private FadeTransitionScript blackFadeScript;
+	private GameObject introBlackFadeTransitionObj;
+	private GameObject outroBlackFadeTransitionObj;
+	private FadeTransitionScript introBlackFadeScript;
+	private FadeTransitionScript outroBlackFadeScript;
 
 	private Image bountiveLogo;
 	private ScaleTransitionScript scaleScript;
@@ -45,21 +47,44 @@ public class SplashSceneScript : MonoBehaviour
 		bountiveFadeScript.endingAlpha = 0.0f;
 		bountiveFadeScript.timeToTransition = 1.0f;
 		bountiveFadeScript.imageColor = new Vector4(1.0f, 1.0f, 1.0f, bountiveFadeScript.startingAlpha);
+		bountiveFadeScript.isUIImage = true;
+		bountiveFadeScript.destoryAfterTransition = true;
 
 
-		blackFadeTransitionObj = Instantiate(blackFadePrefab);
-		blackFadeTransitionObj.AddComponent<FadeTransitionScript>();
-		blackFadeScript = blackFadeTransitionObj.GetComponent<FadeTransitionScript>();
-		Util.resizeObjectToScreen(blackFadeTransitionObj);
+		introBlackFadeTransitionObj = Instantiate(blackFadePrefab);
+		introBlackFadeTransitionObj.AddComponent<FadeTransitionScript>();
+		introBlackFadeScript = introBlackFadeTransitionObj.GetComponent<FadeTransitionScript>();
+		Util.resizeObjectToScreen(introBlackFadeTransitionObj);
 
-		blackFadeScript.startingAlpha = 1.0f;
-		blackFadeScript.endingAlpha = 0.0f;
-		blackFadeScript.timeToTransition = 1.5f;
-		blackFadeScript.imageColor = new Vector4(0.0f, 0.0f, 0.0f, blackFadeScript.startingAlpha);
+		introBlackFadeScript.startingAlpha = 1.0f;
+		introBlackFadeScript.endingAlpha = 0.0f;
+		introBlackFadeScript.timeToTransition = 1.5f;
+		introBlackFadeScript.imageColor = new Vector4(0.0f, 0.0f, 0.0f, introBlackFadeScript.startingAlpha);
+		introBlackFadeScript.isSprite = true;
+		introBlackFadeScript.destoryAfterTransition = true;
+
+
+		outroBlackFadeTransitionObj = Instantiate(blackFadePrefab);
+		outroBlackFadeTransitionObj.GetComponent<SpriteRenderer>().color = new Vector4(
+			outroBlackFadeTransitionObj.GetComponent<SpriteRenderer>().color.r,
+			outroBlackFadeTransitionObj.GetComponent<SpriteRenderer>().color.g,
+			outroBlackFadeTransitionObj.GetComponent<SpriteRenderer>().color.b,
+			0.0f
+		);
+		outroBlackFadeTransitionObj.AddComponent<FadeTransitionScript>();
+		outroBlackFadeScript = outroBlackFadeTransitionObj.GetComponent<FadeTransitionScript>();
+		Util.resizeObjectToScreen(outroBlackFadeTransitionObj);
+
+		outroBlackFadeScript.startingAlpha = 0.0f;
+		outroBlackFadeScript.endingAlpha = 1.0f;
+		outroBlackFadeScript.timeToTransition = 0.5f;
+		outroBlackFadeScript.imageColor = new Vector4(0.0f, 0.0f, 0.0f, outroBlackFadeScript.startingAlpha);
+		outroBlackFadeScript.isSprite = true;
+		outroBlackFadeScript.destoryAfterTransition = true;
+		Debug.Log(outroBlackFadeScript.imageColor);
 
 		startFinished = true;
-		blackFadeScript.startTransition();
-
+		introBlackFadeScript.startTransition();
 	}
 	
 	void Update () 
@@ -69,7 +94,11 @@ public class SplashSceneScript : MonoBehaviour
 			return;
 		}
 
-		if (blackFadeScript.isTransitionOver() && !bountiveFadeScript.isTransitionOver())
+		if (Input.touches.Length > 0 || Input.GetMouseButtonDown(0) && !bountiveFadeScript.isTransitioning())
+		{
+			bountiveFadeScript.startTransition();
+		}
+		else if (introBlackFadeScript.isTransitionOver() && !bountiveFadeScript.isTransitionOver())
 		{
 			elapsedPauseTime += Time.deltaTime;
 
@@ -79,14 +108,15 @@ public class SplashSceneScript : MonoBehaviour
 				elapsedPauseTime = 0;
 			}
 		}
-		else if (bountiveFadeScript.isTransitionOver())
+
+		if (bountiveFadeScript.isTransitionOver() && !outroBlackFadeScript.isTransitioning())
 		{
-			setHomeScreen();
+			outroBlackFadeScript.startTransition();
 		}
 
-
-		if (Input.touches.Length > 0 || Input.GetMouseButtonDown(0))
+		if (outroBlackFadeScript.isTransitionOver())
 		{
+			Camera.main.GetComponent<Camera>().backgroundColor = Color.black;
 			setHomeScreen();
 		}
 	}

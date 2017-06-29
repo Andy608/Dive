@@ -40,8 +40,6 @@ public class OpeningParallaxScript : MonoBehaviour
 	{
 		currentPosition = Vector3.SmoothDamp(currentPosition, targetPosition, ref velocity, timeToGetThere);
 
-		parallaxManagerScript.lerpBackgrounds(currentPosition.y);
-
 		for (int i = 0; i < walls.Length; ++i)
 		{
 			walls[i].GetComponent<MovementScript>().setVelocity(0.0f, -currentPosition.y / walls[i].GetComponent<WallScript>().wallSpeedMultipler * 8.0f);

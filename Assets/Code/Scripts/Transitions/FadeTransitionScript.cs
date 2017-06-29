@@ -11,6 +11,11 @@ public class FadeTransitionScript : MonoBehaviour
 	public float startingAlpha;
 	public float endingAlpha;
 
+	public bool isUIImage;
+	public bool isSprite;
+	public bool isText;
+	public bool destoryAfterTransition;
+
 	private bool transitioning;
 	private bool transitionEnded;
 	private float elapsedTime;
@@ -33,29 +38,16 @@ public class FadeTransitionScript : MonoBehaviour
 		transitioning = true;
 		imageColor.w = startingAlpha;
 
-		if (this.GetComponent<SpriteRenderer>() == null)
-		{
-			this.GetComponent<Image>().color = imageColor;
-		}
-		else
-		{
-			this.GetComponent<SpriteRenderer>().color = imageColor;
-		}
+		setImageColor();
 	}
 
 	private void transition()
 	{
 		elapsedTime += Time.deltaTime;
 
-		imageColor.w = startingAlpha - (elapsedTime / timeToTransition);
-		if (this.GetComponent<SpriteRenderer>() == null)
-		{
-			this.GetComponent<Image>().color = imageColor;
-		}
-		else
-		{
-			this.GetComponent<SpriteRenderer>().color = imageColor;
-		}
+		imageColor.w = Mathf.Lerp(startingAlpha, endingAlpha, (elapsedTime / timeToTransition));
+
+		setImageColor();
 
 		if (elapsedTime >= timeToTransition)
 		{
@@ -67,7 +59,34 @@ public class FadeTransitionScript : MonoBehaviour
 	{
 		transitioning = false;
 		transitionEnded = true;
-		Destroy(this.gameObject);
+
+		if (destoryAfterTransition)
+		{
+			Destroy(this.gameObject);
+		}
+	}
+
+	private void setImageColor()
+	{
+		if (isUIImage)
+		{
+			this.GetComponent<Image>().color = imageColor;
+		}
+		else if (isSprite)
+		{
+			this.GetComponent<SpriteRenderer>().color = imageColor;
+		}
+		else if (isText)
+		{
+			this.GetComponent<Text>().color = imageColor;
+		}
+	}
+
+	public void reset()
+	{
+		transitioning = false;
+		transitionEnded = false;
+		elapsedTime = 0.0f;
 	}
 
 	public bool isTransitioning()

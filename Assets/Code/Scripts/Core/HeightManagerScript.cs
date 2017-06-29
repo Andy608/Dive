@@ -5,15 +5,22 @@ using UnityEngine;
 public class HeightManagerScript : MonoBehaviour
 {
 	private MovementScript gameMovementScript;
+	private float startingDepth;
 
-	void Start () 
+	void Awake () 
 	{
 		gameMovementScript = this.gameObject.GetComponent<MovementScript>();
+		startingDepth = 0;
 	}
 
 	public float getDepth()
 	{
-		return gameMovementScript.getPosition().y;
+		return gameMovementScript.getPosition().y - startingDepth;
+	}
+
+	public float getStartingDepth()
+	{
+		return startingDepth;
 	}
 
 	public void setDepth(float depth)
@@ -31,6 +38,7 @@ public class HeightManagerScript : MonoBehaviour
 		//}
 
 		//gameMovementData.resetToZero();
+		startingDepth = Mathf.Floor(gameMovementScript.getPosition().y);
 	}
 
 	public MovementScript getMovementScript()

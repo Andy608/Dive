@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameManagerScript : MonoBehaviour 
 {
 	private static GameManagerScript gameManagerScript;
+	public const float UI_FADE_TIME = 0.5f;
 
 	private HeightManagerScript heightManagerScript;
 

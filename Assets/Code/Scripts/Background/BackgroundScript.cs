@@ -14,6 +14,8 @@ public class BackgroundScript : MonoBehaviour
 
 	private Vector3 backgroundPosition;
 
+	private HeightManagerScript heightManagerScript;
+
 	void Start () 
 	{
 		lerpPercent = 0.0f;
@@ -25,11 +27,12 @@ public class BackgroundScript : MonoBehaviour
 
 		startPositionY = topScreen + startPositionY;
 		endPositionY = topScreen + endPositionY;
+		heightManagerScript = GameManagerScript.getGameManagerScript().getHeightManager();
 	}
 	
 	public void Update()
 	{
-		lerpPercent = (GameManagerScript.getGameManagerScript().getHeightManager().getDepth() - startLerpY) / (endLerpY - startLerpY);
+		lerpPercent = (heightManagerScript.getDepth() + heightManagerScript.getStartingDepth() - startLerpY) / (endLerpY - startLerpY);
 
 		//Debug.Log(endPositionY + " " + lerpPercent);
 

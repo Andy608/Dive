@@ -36,6 +36,7 @@ public class FlashingTextScript : MonoBehaviour
 
 		if (elapsedIntervalCounter >= flashTime)
 		{
+			alphaTracker = color.a;
 
 			if (fadeOut)
 			{
