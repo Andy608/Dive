@@ -14,21 +14,24 @@ public class MovementScript : MonoBehaviour
 	void Start()
 	{
 		position = this.transform.position;
+		StartCoroutine("updatePhysics");
 	}
 
-	void LateUpdate()
+	IEnumerator updatePhysics()
 	{
-		velocity += acceleration * Time.deltaTime;
-		velocity *= dragForce;//Mathf.Pow(dragForce, deltaTime);
-		velocity *= DAMPING;
-		position += velocity * Time.deltaTime;
-		//this.transform.position = position;
+		while (true)
+		{
+			velocity += acceleration * Time.deltaTime;
+			velocity *= dragForce;//Mathf.Pow(dragForce, deltaTime);
+			//velocity *= DAMPING;
+			position += velocity * Time.deltaTime;
+			//this.transform.position = position;
 
-		acceleration.x = 0;
-		acceleration.y = 0;
+			acceleration.x = 0;
+			acceleration.y = 0;
 
-		velocity.x = 0;
-		velocity.y = 0;
+			yield return new WaitForEndOfFrame();
+		}
 	}
 
 	public void setDrag(float drag)

@@ -16,8 +16,6 @@ public class OpeningParallaxScript : MonoBehaviour
 	private bool isAnimating;
 	private bool isFinishingAnimation;
 
-	private ParallaxManagerScript parallaxManagerScript;
-
 	private GameObject[] walls;
 
 	void Start () 
@@ -26,41 +24,39 @@ public class OpeningParallaxScript : MonoBehaviour
 		targetPosition = new Vector3(transform.position.x, endingDepth, transform.position.z);
 		velocity = new Vector3(0, startingVelocity, 0);
 		walls = GameManagerScript.getGameManagerScript().walls;
+
+		StartCoroutine(updateAnimation());
 	}
 
-	void Update()
+	IEnumerator updateAnimation () 
 	{
-		if (this.isAnimating && !GameManagerScript.getGameManagerScript().isInGame())
+		while (this.isAnimating && !GameManagerScript.getGameManagerScript().isInGame())
 		{
-			updateParallax();
+			currentPosition = Vector3.SmoothDamp(currentPosition, targetPosition, ref velocity, timeToGetThere);
+
+			for (int i = 0; i < walls.Length; ++i)
+			{
+				walls[i].GetComponent<MovementScript>().setVelocity(0.0f, -currentPosition.y / walls[i].GetComponent<WallScript>().wallSpeedMultipler * 8.0f);
+			}
+
+			if (currentPosition.y < 0.01f)
+			{
+				isAnimating = false;
+			}
+			else if (currentPosition.y <= 20.0f)
+			{
+				isFinishingAnimation = true;
+			}
+
+			GameManagerScript.getGameManagerScript().getHeightManager().getMovementScript().setPosition(currentPosition.x, currentPosition.y);
+
+			yield return null;
 		}
 	}
 
-	private void updateParallax () 
-	{
-		currentPosition = Vector3.SmoothDamp(currentPosition, targetPosition, ref velocity, timeToGetThere);
-
-		for (int i = 0; i < walls.Length; ++i)
-		{
-			walls[i].GetComponent<MovementScript>().setVelocity(0.0f, -currentPosition.y / walls[i].GetComponent<WallScript>().wallSpeedMultipler * 8.0f);
-		}
-
-		if (currentPosition.y < 0.01f)
-		{
-			isAnimating = false;
-		}
-		else if (currentPosition.y <= 20.0f)
-		{
-			isFinishingAnimation = true;
-		}
-
-		GameManagerScript.getGameManagerScript().getHeightManager().getMovementScript().setPosition(currentPosition.x, currentPosition.y);
-	}
-
-	public void startAnimation(ParallaxManagerScript parallaxManagerScript)
+	public void startAnimation()
 	{
 		isAnimating = true;
-		this.parallaxManagerScript = parallaxManagerScript;
 	}
 
 	public bool getIsAnimating()

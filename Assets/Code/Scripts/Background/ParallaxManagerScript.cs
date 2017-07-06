@@ -20,41 +20,40 @@ public class ParallaxManagerScript : MonoBehaviour
 			DontDestroyOnLoad(backgroundObjects[i]);
 			backgroundObjects[i].SetActive(false);
 		}
+
+		StartCoroutine("animateBackgrounds");
 	}
 
-	void Update ()
+	IEnumerator animateBackgrounds()
 	{
-		float depth = GameManagerScript.getGameManagerScript().getHeightManager().getDepth();
-		//Debug.Log(depth);
-
-		for (int i = 0; i < backgroundObjects.Length; ++i)
+		while (true)
 		{
-			if (!activeBackgrounds.Contains(backgroundObjects[i]) && 
-				(depth > backgroundObjects[i].GetComponent<BackgroundScript>().startLerpY && 
+			float depth = GameManagerScript.getGameManagerScript().getHeightManager().getDepth();
+			//Debug.Log(depth);
 
-				(i + 1 == backgroundObjects.Length || (i + 1 < backgroundObjects.Length && 
-				depth < backgroundObjects[i + 1].GetComponent<BackgroundScript>().endLerpY))))
+			for (int i = 0; i < backgroundObjects.Length; ++i)
 			{
-				//Debug.Log("ACTIVATING BACKGROUND: " + i);
-				activeBackgrounds.Add(backgroundObjects[i]);
-				backgroundObjects[i].SetActive(true);
+				if (!activeBackgrounds.Contains(backgroundObjects[i]) && 
+					(depth > backgroundObjects[i].GetComponent<BackgroundScript>().startLerpY && 
+
+						(i + 1 == backgroundObjects.Length || (i + 1 < backgroundObjects.Length && 
+							depth < backgroundObjects[i + 1].GetComponent<BackgroundScript>().endLerpY))))
+				{
+					//Debug.Log("ACTIVATING BACKGROUND: " + i);
+					activeBackgrounds.Add(backgroundObjects[i]);
+					backgroundObjects[i].SetActive(true);
+				}
+				else if (activeBackgrounds.Contains(backgroundObjects[i]) && 
+					((depth < backgroundObjects[i].GetComponent<BackgroundScript>().startLerpY && i - 1 >= 0) ||
+						(i + 1 < backgroundObjects.Length && depth > backgroundObjects[i + 1].GetComponent<BackgroundScript>().endLerpY)))
+				{
+					//Debug.Log("DEACTIVATING BACKGROUND: " + i);
+					activeBackgrounds.Remove(backgroundObjects[i]);
+					backgroundObjects[i].SetActive(false);
+				}
 			}
-			else if (activeBackgrounds.Contains(backgroundObjects[i]) && 
-				((depth < backgroundObjects[i].GetComponent<BackgroundScript>().startLerpY && i - 1 >= 0) ||
-					(i + 1 < backgroundObjects.Length && depth > backgroundObjects[i + 1].GetComponent<BackgroundScript>().endLerpY)))
-			{
-				//Debug.Log("DEACTIVATING BACKGROUND: " + i);
-				activeBackgrounds.Remove(backgroundObjects[i]);
-				backgroundObjects[i].SetActive(false);
-			}
+
+			yield return null;
 		}
-	}
-
-	public void lerpBackgrounds(float lerpDepth)
-	{
-		//for (int i = 0; i < activeBackgrounds.Count; ++i)
-		//{
-		//	activeBackgrounds[i].GetComponent<BackgroundScript>().lerpBackground(lerpDepth);
-		//}
 	}
 }

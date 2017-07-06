@@ -28,41 +28,47 @@ public class FlashingTextScript : MonoBehaviour
 	{
 		objText = flashingText.GetComponent<Text>();
 		reset();
+		StartCoroutine(updateFlash());
 	}
 	
-	void Update () 
+	IEnumerator updateFlash () 
 	{
-		elapsedIntervalCounter += Time.deltaTime;
-
-		if (elapsedIntervalCounter >= flashTime)
+		while (true)
 		{
-			alphaTracker = color.a;
+			elapsedIntervalCounter += Time.deltaTime;
 
-			if (fadeOut)
+			if (elapsedIntervalCounter >= flashTime)
 			{
-				alphaTracker -= Time.deltaTime * fadeTime;
+				alphaTracker = color.a;
 
-				if (alphaTracker <= ALPHA_TRANSPARENT)
+				if (fadeOut)
 				{
-					alphaTracker = ALPHA_TRANSPARENT;
-					fadeOut = false;
-					elapsedIntervalCounter = 0.0f;
-				}
-			}
-			else
-			{
-				alphaTracker += Time.deltaTime * fadeTime;
+					alphaTracker -= Time.deltaTime * fadeTime;
 
-				if (alphaTracker >= ALPHA_OPAQUE)
+					if (alphaTracker <= ALPHA_TRANSPARENT)
+					{
+						alphaTracker = ALPHA_TRANSPARENT;
+						fadeOut = false;
+						elapsedIntervalCounter = 0.0f;
+					}
+				}
+				else
 				{
-					alphaTracker = ALPHA_OPAQUE;
-					fadeOut = true;
-					elapsedIntervalCounter = 0.0f;
+					alphaTracker += Time.deltaTime * fadeTime;
+
+					if (alphaTracker >= ALPHA_OPAQUE)
+					{
+						alphaTracker = ALPHA_OPAQUE;
+						fadeOut = true;
+						elapsedIntervalCounter = 0.0f;
+					}
 				}
+
+				color.a = alphaTracker;
+				objText.color = color;
 			}
 
-			color.a = alphaTracker;
-			objText.color = color;
+			yield return null;
 		}
 	}
 

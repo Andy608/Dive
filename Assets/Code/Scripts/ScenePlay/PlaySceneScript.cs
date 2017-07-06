@@ -10,19 +10,20 @@ public class PlaySceneScript : MonoBehaviour {
 
 	public Vector3 diveVelocity;
 
-	private FadeTransitionScript depthTextObjFadeScript;
+	private FadeCoroutine depthTextObjFadeScript;
 
-	private ParallaxManagerScript parallaxManagerScript;
+	//private ParallaxManagerScript parallaxManagerScript;
 
 	void Start () 
 	{
-		depthTextObjFadeScript = depthTextObj.GetComponent<FadeTransitionScript>();
+		depthTextObj.AddComponent<FadeCoroutine>();
+		depthTextObjFadeScript = depthTextObj.GetComponent<FadeCoroutine>();
 		depthTextObjFadeScript.startingAlpha = 0.0f;
 		depthTextObjFadeScript.endingAlpha = 1.0f;
 		depthTextObjFadeScript.timeToTransition = GameManagerScript.UI_FADE_TIME;
 		depthTextObjFadeScript.imageColor = depthTextObjFadeScript.GetComponent<Text>().color;
 		depthTextObjFadeScript.isText = true;
-		depthTextObjFadeScript.startTransition();
+		StartCoroutine(depthTextObjFadeScript.fade());
 
 		if (GameManagerScript.getGameManagerScript() == null)
 		{
@@ -30,15 +31,18 @@ public class PlaySceneScript : MonoBehaviour {
 			GameManagerScript.getGameManagerScript().startGame();
 		}
 		
-		parallaxManagerScript = GameManagerScript.getGameManagerScript().GetComponent<ParallaxManagerScript>();
+		//parallaxManagerScript = GameManagerScript.getGameManagerScript().GetComponent<ParallaxManagerScript>();
+
+		GameManagerScript.getGameManagerScript().getHeightManager().getMovementScript().velocity = diveVelocity;
+		//StartCoroutine(updatePlayScene());
 	}
 	
-	void Update () 
+	IEnumerator updatePlayScene () 
 	{
-		if (GameManagerScript.getGameManagerScript().isInGame() && depthTextObjFadeScript.isTransitionOver())
+		while (GameManagerScript.getGameManagerScript().isInGame())
 		{
-			GameManagerScript.getGameManagerScript().getHeightManager().getMovementScript().velocity += diveVelocity;
-			parallaxManagerScript.lerpBackgrounds(GameManagerScript.getGameManagerScript().getHeightManager().getDepth());
+			//parallaxManagerScript.lerpBackgrounds(GameManagerScript.getGameManagerScript().getHeightManager().getDepth());
+			yield return null;
 		}
 	}
 }

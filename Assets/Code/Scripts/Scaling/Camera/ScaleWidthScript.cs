@@ -16,11 +16,21 @@ public class ScaleWidthScript : MonoBehaviour
 		cameraObj = this.GetComponent<Camera>();
 	}
 
-	void Update () 
+	void Start ()
 	{
-		calculatedHeight = Mathf.RoundToInt(targetWidth / (float)Screen.width * Screen.height);
-		//Debug.Log(calculatedHeight);
+		StartCoroutine(updateCamera());
+	}
 
-		cameraObj.orthographicSize = calculatedHeight / pixelsToUnits / 2;
+	IEnumerator updateCamera()
+	{
+		while (true)
+		{
+			calculatedHeight = Mathf.RoundToInt(targetWidth / (float)Screen.width * Screen.height);
+			//Debug.Log(calculatedHeight);
+
+			cameraObj.orthographicSize = calculatedHeight / pixelsToUnits / 2;
+
+			yield return null;
+		}
 	}
 }

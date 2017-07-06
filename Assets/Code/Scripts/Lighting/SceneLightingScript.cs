@@ -14,15 +14,21 @@ public class SceneLightingScript : MonoBehaviour
 	void Start()
 	{
 		sceneLight = this.gameObject.GetComponent<Light>();
+		StartCoroutine("updateLighting");
 	}
 
-	void Update () 
+	IEnumerator updateLighting()
 	{
-		depth = GameManagerScript.getGameManagerScript().getHeightManager().getDepth();
+		while (true)
+		{
+			depth = GameManagerScript.getGameManagerScript().getHeightManager().getDepth();
 
 
-		lerpPercent = (depth - completeLightnessDepth) / (completeDarknessDepth - completeLightnessDepth);
+			lerpPercent = (depth - completeLightnessDepth) / (completeDarknessDepth - completeLightnessDepth);
 
-		sceneLight.intensity = Mathf.Lerp(1.0f, 0.0f, lerpPercent);
+			sceneLight.intensity = Mathf.Lerp(1.0f, 0.0f, lerpPercent);
+
+			yield return null;
+		}
 	}
 }

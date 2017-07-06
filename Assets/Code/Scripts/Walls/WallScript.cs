@@ -12,34 +12,53 @@ public class WallScript : MonoBehaviour
 	private Vector3 shiftOffset = new Vector3();
 	private float height;
 
+	private bool isUpdating;
+
 	void Start () 
 	{
+		isUpdating = false;
 		height = this.GetComponent<SpriteRenderer>().sprite.rect.height;
 		shiftOffset.y = height * WallSpawnerScript.WALL_SHIFT;
 		wallMovement = this.gameObject.GetComponent<MovementScript>();
 		DontDestroyOnLoad(this.transform.gameObject);
+		StartCoroutine(updateWall());
 	}
-	
-	void Update () 
+
+	IEnumerator updateWall ()
 	{
-		//Debug.Log(wallMovement.getVelocity());
+		isUpdating = true;
 
-		if (this.transform.position.y + (height / 2.0f) < -(Camera.main.GetComponent<ScaleWidthScript>().calculatedHeight))
+		while (true)
 		{
-			this.transform.position += shiftOffset;
+			if (this.transform.position.y + (height / 2.0f) < -(Camera.main.GetComponent<ScaleWidthScript>().calculatedHeight))
+			{
+				this.transform.position += shiftOffset;
+			}
+			else if (this.transform.position.y - (height / 2.0f) > (Camera.main.GetComponent<ScaleWidthScript>().calculatedHeight))
+			{
+				this.transform.position -= shiftOffset;
+			}
+
+			if (GameManagerScript.getGameManagerScript().isInGame())
+			{
+				wallMovement.setVelocity(GameManagerScript.getGameManagerScript().getHeightManager().getMovementScript().getVelocity());
+			}
+
+			this.transform.position += wallMovement.getVelocity() * Time.deltaTime * wallSpeedMultipler;
+
+			//Debug.Log("Velocity " + GameManagerScript.getGameManagerScript().getHeightManager().getMovementScript().getVelocity() * Time.deltaTime);
+
+			yield return null;
 		}
-		else if (this.transform.position.y - (height / 2.0f) > (Camera.main.GetComponent<ScaleWidthScript>().calculatedHeight))
+	}
+
+	void startCoroutine()
+	{
+		if (isUpdating)
 		{
-			this.transform.position -= shiftOffset;
+			StopCoroutine("updateWall");
 		}
 
-		if (GameManagerScript.getGameManagerScript().isInGame())
-		{
-			wallMovement.setVelocity(GameManagerScript.getGameManagerScript().getHeightManager().getMovementScript().getVelocity());
-		}
-
-		this.transform.position += wallMovement.getVelocity() * Time.deltaTime * wallSpeedMultipler;
-
-//		Debug.Log("Velocity " + wallMovement.getVelocity() * Time.deltaTime);
+		StartCoroutine("updateWall");
 	}
 }

@@ -16,12 +16,17 @@ public class DepthScript : MonoBehaviour
 		depthText = depthTextObj.GetComponent<Text>();
 		depthText.text = "0" + getUnit();
 		heightManagerScript = GameManagerScript.getGameManagerScript().getHeightManager();
+		StartCoroutine(updateText());
 	}
 	
-	void Update () 
+	IEnumerator updateText () 
 	{
-		depth = Mathf.Floor(heightManagerScript.getDepth()).ToString("n0");
-		depthText.text = depth + getUnit();
+		while (true)
+		{
+			depth = Mathf.Floor(heightManagerScript.getDepth()).ToString("n0");
+			depthText.text = depth + getUnit();
+			yield return null;
+		}
 	}
 
 	private string getUnit()

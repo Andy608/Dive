@@ -40,12 +40,6 @@ public class GameManagerScript : MonoBehaviour
 	{
 		walls = GameObject.FindGameObjectsWithTag("Wall");
 	}
-	
-	void Update () 
-	{
-		//Debug.Log("ACCELERATION: " + GameManagerScript.getGameManagerScript().getHeightManager().gameMovementData.getAcceleration());
-		//Debug.Log("VELOCITY: " + GameManagerScript.getGameManagerScript().getHeightManager().gameMovementData.getVelocity());
-	}
 
 	public void startGame()
 	{

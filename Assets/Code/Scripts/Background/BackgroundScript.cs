@@ -28,18 +28,24 @@ public class BackgroundScript : MonoBehaviour
 		startPositionY = topScreen + startPositionY;
 		endPositionY = topScreen + endPositionY;
 		heightManagerScript = GameManagerScript.getGameManagerScript().getHeightManager();
+		StartCoroutine("lerpBackground");
 	}
-	
-	public void Update()
+
+	IEnumerator lerpBackground()
 	{
-		lerpPercent = (heightManagerScript.getDepth() + heightManagerScript.getStartingDepth() - startLerpY) / (endLerpY - startLerpY);
+		while (true)
+		{
+			lerpPercent = (heightManagerScript.getDepth() + heightManagerScript.getStartingDepth() - startLerpY) / (endLerpY - startLerpY);
 
-		//Debug.Log(endPositionY + " " + lerpPercent);
+			//Debug.Log(endPositionY + " " + lerpPercent);
 
 
-		backgroundPosition.y = Camera.main.transform.position.y + Mathf.Lerp(startPositionY, endPositionY, lerpPercent);
-		backgroundPosition.z = this.transform.position.z;
+			backgroundPosition.y = Camera.main.transform.position.y + Mathf.Lerp(startPositionY, endPositionY, lerpPercent);
+			backgroundPosition.z = this.transform.position.z;
 
-		this.transform.position = backgroundPosition;
+			this.transform.position = backgroundPosition;
+
+			yield return null;
+		}
 	}
 }

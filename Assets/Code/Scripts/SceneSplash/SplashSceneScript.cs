@@ -17,12 +17,12 @@ public class SplashSceneScript : MonoBehaviour
 
 	private GameObject introBlackFadeTransitionObj;
 	private GameObject outroBlackFadeTransitionObj;
-	private FadeTransitionScript introBlackFadeScript;
-	private FadeTransitionScript outroBlackFadeScript;
+	private FadeCoroutine introBlackFadeScript;
+	private FadeCoroutine outroBlackFadeScript;
 
 	private Image bountiveLogo;
 	private ScaleTransitionScript scaleScript;
-	private FadeTransitionScript bountiveFadeScript;
+	private FadeCoroutine bountiveFadeScript;
 
 	private float elapsedPauseTime;
 
@@ -33,7 +33,7 @@ public class SplashSceneScript : MonoBehaviour
 		Camera.main.GetComponent<Camera>().backgroundColor = Color.white;
 		bountiveLogo = Instantiate(bountiveLogoPrefab);
 		bountiveLogo.gameObject.AddComponent<ScaleTransitionScript>();
-		bountiveLogo.gameObject.AddComponent<FadeTransitionScript>();
+		bountiveLogo.gameObject.AddComponent<FadeCoroutine>();
 		bountiveLogo.transform.SetParent(canvas.transform);
 		bountiveLogo.transform.localPosition = new Vector3(0.0f, 0.0f, canvas.transform.localPosition.z);
 
@@ -42,7 +42,7 @@ public class SplashSceneScript : MonoBehaviour
 		scaleScript.endingScale = endingScale;
 		scaleScript.timeToTransition = timeToTransition;
 
-		bountiveFadeScript = bountiveLogo.GetComponent<FadeTransitionScript>();
+		bountiveFadeScript = bountiveLogo.GetComponent<FadeCoroutine>();
 		bountiveFadeScript.startingAlpha = 1.0f;
 		bountiveFadeScript.endingAlpha = 0.0f;
 		bountiveFadeScript.timeToTransition = 1.0f;
@@ -52,8 +52,8 @@ public class SplashSceneScript : MonoBehaviour
 
 
 		introBlackFadeTransitionObj = Instantiate(blackFadePrefab);
-		introBlackFadeTransitionObj.AddComponent<FadeTransitionScript>();
-		introBlackFadeScript = introBlackFadeTransitionObj.GetComponent<FadeTransitionScript>();
+		introBlackFadeTransitionObj.AddComponent<FadeCoroutine>();
+		introBlackFadeScript = introBlackFadeTransitionObj.GetComponent<FadeCoroutine>();
 		Util.resizeObjectToScreen(introBlackFadeTransitionObj);
 
 		introBlackFadeScript.startingAlpha = 1.0f;
@@ -71,8 +71,8 @@ public class SplashSceneScript : MonoBehaviour
 			outroBlackFadeTransitionObj.GetComponent<SpriteRenderer>().color.b,
 			0.0f
 		);
-		outroBlackFadeTransitionObj.AddComponent<FadeTransitionScript>();
-		outroBlackFadeScript = outroBlackFadeTransitionObj.GetComponent<FadeTransitionScript>();
+		outroBlackFadeTransitionObj.AddComponent<FadeCoroutine>();
+		outroBlackFadeScript = outroBlackFadeTransitionObj.GetComponent<FadeCoroutine>();
 		Util.resizeObjectToScreen(outroBlackFadeTransitionObj);
 
 		outroBlackFadeScript.startingAlpha = 0.0f;
@@ -80,44 +80,43 @@ public class SplashSceneScript : MonoBehaviour
 		outroBlackFadeScript.timeToTransition = 0.5f;
 		outroBlackFadeScript.imageColor = new Vector4(0.0f, 0.0f, 0.0f, outroBlackFadeScript.startingAlpha);
 		outroBlackFadeScript.isSprite = true;
-		outroBlackFadeScript.destoryAfterTransition = true;
-		Debug.Log(outroBlackFadeScript.imageColor);
+		outroBlackFadeScript.destoryAfterTransition = false;
 
 		startFinished = true;
-		introBlackFadeScript.startTransition();
+		StartCoroutine(introBlackFadeScript.fade());
+		StartCoroutine(updateSplashScene());
 	}
 	
-	void Update () 
+	IEnumerator updateSplashScene () 
 	{
-		if (!startFinished)
+		while (startFinished)
 		{
-			return;
-		}
-
-		if (Input.touches.Length > 0 || Input.GetMouseButtonDown(0) && !bountiveFadeScript.isTransitioning())
-		{
-			bountiveFadeScript.startTransition();
-		}
-		else if (introBlackFadeScript.isTransitionOver() && !bountiveFadeScript.isTransitionOver())
-		{
-			elapsedPauseTime += Time.deltaTime;
-
-			if (elapsedPauseTime >= pauseTime)
+			if ((Input.touches.Length > 0 || Input.GetMouseButtonDown(0)) && !bountiveFadeScript.isTransitioning() && !bountiveFadeScript.isTransitionOver())
 			{
-				bountiveFadeScript.startTransition();
-				elapsedPauseTime = 0;
+				StartCoroutine(bountiveFadeScript.fade());
 			}
-		}
+			else if (introBlackFadeScript.isTransitionOver() && !bountiveFadeScript.isTransitionOver())
+			{
+				elapsedPauseTime += Time.deltaTime;
 
-		if (bountiveFadeScript.isTransitionOver() && !outroBlackFadeScript.isTransitioning())
-		{
-			outroBlackFadeScript.startTransition();
-		}
+				if (elapsedPauseTime >= pauseTime && !bountiveFadeScript.isTransitioning())
+				{
+					StartCoroutine(bountiveFadeScript.fade());
+					elapsedPauseTime = 0;
+				}
+			}
 
-		if (outroBlackFadeScript.isTransitionOver())
-		{
-			Camera.main.GetComponent<Camera>().backgroundColor = Color.black;
-			setHomeScreen();
+			if (bountiveFadeScript.isTransitionOver() && !outroBlackFadeScript.isTransitionOver() && !outroBlackFadeScript.isTransitioning())
+			{
+				StartCoroutine(outroBlackFadeScript.fade());
+			}
+
+			if (outroBlackFadeScript.isTransitionOver())
+			{
+				setHomeScreen();
+			}
+
+			yield return null;
 		}
 	}
 
